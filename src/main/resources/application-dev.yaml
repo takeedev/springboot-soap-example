@@ -1,0 +1,15 @@
+spring:
+    application:
+        name: soap-example
+server:
+  port: 1919
+springdoc:
+    swagger-ui:
+      path: /swagger
+      displayRequestDuration: true
+      tryItOutEnabled: true
+      groupsOrder: DESC
+      operations-sorter: alpha
+      tags-sorter: alpha
+    api-docs:
+      path: /api-doc
