@@ -1,0 +1,79 @@
+package takee.dev.soapExample;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+import org.w3c.dom.Document;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathFactory;
+
+@Slf4j
+@RestController
+@RequiredArgsConstructor
+@RequestMapping(value = "/api")
+@Tag(name = "Soap Controller For Send To Soap", description = "Learning Soap")
+public class SoapController {
+
+    @GetMapping("/getRequest")
+    @Operation(summary = "Send To Soap", description = "Test Send To Soap")
+    public ResponseEntity getMethodName() throws Exception {
+
+        String requestXml = setRequest();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.TEXT_XML);
+        headers.add("SOAPAction", "http://www.oorsprong.org/websamples.countryinfo/CountryInfoService.wso/CapitalCity");
+
+        HttpEntity<String> entity = new HttpEntity<>(requestXml, headers);
+
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> response = restTemplate.exchange(
+                "http://webservices.oorsprong.org/websamples.countryinfo/CountryInfoService.wso",
+                HttpMethod.POST,
+                entity,
+                String.class
+        );
+
+        String body = response.getBody();
+        log.info(body);
+        assert body != null;
+        String capital = extractCapitalCity(body);
+
+        return new ResponseEntity<>(capital, HttpStatus.OK);
+    }
+
+    private static String setRequest() {
+
+        String countryCode = "TH";
+
+        return String.format("""
+                <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                                  xmlns:web="http://www.oorsprong.org/websamples.countryinfo">
+                   <soapenv:Header/>
+                   <soapenv:Body>
+                      <web:CapitalCity>
+                         <web:sCountryISOCode>%s</web:sCountryISOCode>
+                      </web:CapitalCity>
+                   </soapenv:Body>
+                </soapenv:Envelope>
+                """, countryCode);
+    }
+
+    private String extractCapitalCity(String xml) throws Exception {
+        Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+                .parse(new java.io.ByteArrayInputStream(xml.getBytes()));
+
+        XPath xpath = XPathFactory.newInstance().newXPath();
+        String expression = "//*[local-name()='CapitalCityResult']/text()";
+        return xpath.evaluate(expression, doc);
+    }
+
+}
