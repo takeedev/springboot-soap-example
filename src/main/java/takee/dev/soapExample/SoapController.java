@@ -22,6 +22,8 @@ import javax.xml.xpath.XPathFactory;
 @Tag(name = "Soap Controller For Send To Soap", description = "Learning Soap")
 public class SoapController {
 
+    private final RestTemplate restTemplate;
+
     @GetMapping("/getRequest")
     @Operation(summary = "Send To Soap", description = "Test Send To Soap")
     public ResponseEntity getMethodName() throws Exception {
@@ -34,7 +36,6 @@ public class SoapController {
 
         HttpEntity<String> entity = new HttpEntity<>(requestXml, headers);
 
-        RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> response = restTemplate.exchange(
                 "http://webservices.oorsprong.org/websamples.countryinfo/CountryInfoService.wso",
                 HttpMethod.POST,
