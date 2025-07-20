@@ -1,27 +1,21 @@
 package takee.dev.soapExample;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.client.ExpectedCount;
-import org.springframework.test.web.client.MockRestServiceServer;
-import org.springframework.test.web.client.match.MockRestRequestMatchers;
-import org.springframework.test.web.client.response.MockRestResponseCreators;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.client.RestTemplate;
 
-@ExtendWith(SpringExtension.class)
 @WebMvcTest(SoapController.class)
 class SoapControllerTest {
 
@@ -29,20 +23,28 @@ class SoapControllerTest {
     private MockMvc mockMvc;
 
     @MockitoBean
-    private RestTemplateBuilder restTemplateBuilder;
-
-    private MockRestServiceServer mockServer;
-
-    @BeforeEach
-    void setUp() {
-        RestTemplate restTemplate = new RestTemplate();
-        mockServer = MockRestServiceServer.createServer(restTemplate);
-        Mockito.when(restTemplateBuilder.build()).thenReturn(restTemplate);
-    }
+    private RestTemplate restTemplate;
 
     @Test
     @DisplayName("Should Return Capital City")
     void shouldReturnCapitalCity() throws Exception {
+
+        ResponseEntity<String> mockEntity = getStringResponseEntity();
+
+        Mockito.when(restTemplate.exchange(
+                        ArgumentMatchers.anyString(),
+                        ArgumentMatchers.eq(HttpMethod.POST),
+                        Mockito.any(HttpEntity.class),
+                        ArgumentMatchers.eq(String.class)))
+                .thenReturn(mockEntity);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/getRequest"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string("Bangkok"));
+
+    }
+
+    private static ResponseEntity<String> getStringResponseEntity() {
 
         String mockSoapResponse = """
             <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
@@ -54,14 +56,6 @@ class SoapControllerTest {
             </soap:Envelope>
             """;
 
-        mockServer.expect(ExpectedCount.once(),
-                        MockRestRequestMatchers.requestTo("http://webservices.oorsprong.org/websamples.countryinfo/CountryInfoService.wso"))
-                .andExpect(MockRestRequestMatchers.method(HttpMethod.POST))
-                .andRespond(MockRestResponseCreators.withSuccess(mockSoapResponse, MediaType.TEXT_XML));
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/getRequest"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().string("Bangkok"));
-
+        return new ResponseEntity<>(mockSoapResponse, HttpStatus.OK);
     }
 }
