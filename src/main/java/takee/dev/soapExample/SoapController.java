@@ -32,7 +32,8 @@ public class SoapController {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.TEXT_XML);
-        headers.add("SOAPAction", "http://www.oorsprong.org/websamples.countryinfo/CountryInfoService.wso/CapitalCity");
+        headers.add("SOAPAction", "http://www.oorsprong.org/websamples.countryinfo/CapitalCity");
+        headers.setBasicAuth("username", "P@ssword");
 
         HttpEntity<String> entity = new HttpEntity<>(requestXml, headers);
 
