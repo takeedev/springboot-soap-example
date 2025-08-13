@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.w3c.dom.Document;
+import takee.dev.soapExample.service.SoapClientService;
+import takee.dev.soapExample.soap.CapitalCityResponse;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
@@ -23,6 +25,7 @@ import javax.xml.xpath.XPathFactory;
 public class SoapController {
 
     private final RestTemplate restTemplate;
+    private final SoapClientService soapClientService;
 
     @GetMapping("/getRequest")
     @Operation(summary = "Send To Soap", description = "Test Send To Soap")
@@ -76,6 +79,13 @@ public class SoapController {
         XPath xpath = XPathFactory.newInstance().newXPath();
         String expression = "//*[local-name()='CapitalCityResult']/text()";
         return xpath.evaluate(expression, doc);
+    }
+
+    @GetMapping("/getSoap")
+    @Operation(summary = "Send To Soap", description = "Test Send To Soap")
+    public ResponseEntity getSoapAPI() {
+        CapitalCityResponse response = soapClientService.capitalCity("TH");
+        return new ResponseEntity<>(response.getCapitalCityResult(), HttpStatus.OK);
     }
 
 }
