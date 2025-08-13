@@ -2,7 +2,10 @@ package takee.dev.soapExample;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.support.BasicAuthenticationInterceptor;
+import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.ws.client.core.WebServiceTemplate;
 
 @Configuration
 public class SoapConfig {
@@ -12,4 +15,25 @@ public class SoapConfig {
         return new RestTemplate();
     }
 
+    @Bean
+    public Jaxb2Marshaller marshaller() {
+        Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
+        marshaller.setPackagesToScan("takee.dev.soapExample.soap");
+//        marshaller.setMtomEnabled(true);
+        return marshaller;
+    }
+
+    @Bean
+    public WebServiceTemplate webServiceTemplate(Jaxb2Marshaller marshaller) {
+        WebServiceTemplate template = new WebServiceTemplate();
+        template.setMarshaller(marshaller);
+        template.setUnmarshaller(marshaller);
+
+        // ถ้าใช้ Basic Auth
+//        HttpComponentsMessageSender messageSender = new HttpComponentsMessageSender();
+//        messageSender.setCredentials(new UsernamePasswordCredentials("user", "password"));
+//        template.setMessageSender(messageSender);
+
+        return template;
+    }
 }

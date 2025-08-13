@@ -59,16 +59,6 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-        <dependency>
-            <groupId>jakarta.xml.bind</groupId>
-            <artifactId>jakarta.xml.bind-api</artifactId>
-            <version>4.0.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.jaxb</groupId>
-            <artifactId>jaxb-runtime</artifactId>
-            <version>4.0.5</version>
-        </dependency>
 	</dependencies>
 
 	<build>
@@ -97,25 +87,45 @@
 					</excludes>
 				</configuration>
 			</plugin>
+<!--            <plugin>-->
+<!--                <groupId>com.sun.xml.ws</groupId>-->
+<!--                <artifactId>jaxws-maven-plugin</artifactId>-->
+<!--                <version>3.0.0</version>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <goals>-->
+<!--                            <goal>wsimport</goal>-->
+<!--                        </goals>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--                <configuration>-->
+<!--                    <wsdlUrls>-->
+<!--                        <wsdlUrl>http://webservices.oorsprong.org/websamples.countryinfo/CountryInfoService.wso?WSDL</wsdlUrl>-->
+<!--                    </wsdlUrls>-->
+<!--                    <sourceDestDir>${project.basedir}/src/main/java</sourceDestDir>-->
+<!--                    <destDir>takee.dev.soapExample.soap</destDir>-->
+<!--                    <packageName>takee.dev.soapExample.soap</packageName>-->
+<!--                    <extension>true</extension>-->
+<!--                </configuration>-->
+<!--            </plugin>-->
             <plugin>
-                <groupId>com.sun.xml.ws</groupId>
-                <artifactId>jaxws-maven-plugin</artifactId>
-                <version>3.0.0</version>
+                <groupId>org.jvnet.jaxb2.maven2</groupId>
+                <artifactId>maven-jaxb2-plugin</artifactId>
+                <version>0.13.2</version>
                 <executions>
                     <execution>
                         <goals>
-                            <goal>wsimport</goal>
+                            <goal>generate</goal>
                         </goals>
                     </execution>
                 </executions>
                 <configuration>
-                    <wsdlUrls>
-                        <wsdlUrl>http://webservices.oorsprong.org/websamples.countryinfo/CountryInfoService.wso?WSDL</wsdlUrl>
-                    </wsdlUrls>
-                    <sourceDestDir>${project.basedir}/src/main/java</sourceDestDir>
-                    <destDir>takee.dev.soapExample.soap</destDir>
-                    <packageName>takee.dev.soapExample.soap</packageName>
-                    <extension>true</extension>
+                    <generatePackage>takee.dev.soapExample.soapExam</generatePackage>
+                    <generateDirectory>${project.basedir}/src/main/java</generateDirectory>
+                    <schemaDirectory>${project.basedir}/src/main/resources/wsdl</schemaDirectory>
+                    <schemaIncludes>
+                        <include>*.wsdl</include>
+                    </schemaIncludes>
                 </configuration>
             </plugin>
 		</plugins>
