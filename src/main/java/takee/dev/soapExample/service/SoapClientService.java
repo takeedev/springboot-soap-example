@@ -19,9 +19,10 @@ public class SoapClientService {
 
     public CapitalCityResponse capitalCity(String countryISOCode) {
 
-        CapitalCity request = new CapitalCity();
+        var request = new CapitalCity();
         request.setSCountryISOCode(countryISOCode);
-        CapitalCityResponse response = sendSoapRequest(
+
+        var response = sendSoapRequest(
                 request,
                 "http://webservices.oorsprong.org/websamples.countryinfo/CountryInfoService.wso",
                 "http://webservices.oorsprong.org/websamples.countryinfo/CountryInfoService.wso/CapitalCity",
@@ -29,9 +30,9 @@ public class SoapClientService {
         );
         log.info("Capital of {} = {}", countryISOCode, response.getCapitalCityResult());
 
-        CountryName countryName = new CountryName();
+        var countryName = new CountryName();
         countryName.setSCountryISOCode(countryISOCode);
-        CountryNameResponse countryNameResponse = sendSoapRequest(
+        var countryNameResponse = sendSoapRequest(
                 countryName,
                 "http://webservices.oorsprong.org/websamples.countryinfo/CountryInfoService.wso",
                 "http://webservices.oorsprong.org/websamples.countryinfo/CountryInfoService.wso/CountryName",
@@ -43,7 +44,7 @@ public class SoapClientService {
     }
 
     private <T> T sendSoapRequest(Object request, String url, String soapAction, Class<T> responseType) {
-        SoapActionCallback callback = new SoapActionCallback(soapAction);
+        var callback = new SoapActionCallback(soapAction);
         Object rawResponse = webServiceTemplate.marshalSendAndReceive(url, request, callback);
         return responseType.cast(rawResponse);
     }

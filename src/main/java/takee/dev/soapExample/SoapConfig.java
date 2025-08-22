@@ -2,7 +2,6 @@ package takee.dev.soapExample;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.client.support.BasicAuthenticationInterceptor;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.ws.client.core.WebServiceTemplate;
@@ -28,12 +27,6 @@ public class SoapConfig {
         WebServiceTemplate template = new WebServiceTemplate();
         template.setMarshaller(marshaller);
         template.setUnmarshaller(marshaller);
-
-        // ถ้าใช้ Basic Auth
-//        HttpComponentsMessageSender messageSender = new HttpComponentsMessageSender();
-//        messageSender.setCredentials(new UsernamePasswordCredentials("user", "password"));
-//        template.setMessageSender(messageSender);
-
         return template;
     }
 }
