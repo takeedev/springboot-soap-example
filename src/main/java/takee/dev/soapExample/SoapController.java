@@ -9,9 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
-import org.w3c.dom.Document;
 import takee.dev.soapExample.service.SoapClientService;
-import takee.dev.soapExample.soap.CapitalCityResponse;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
@@ -33,13 +31,11 @@ public class SoapController {
 
         String requestXml = setRequest();
 
-        HttpHeaders headers = new HttpHeaders();
+        var headers = new HttpHeaders();
         headers.setContentType(MediaType.TEXT_XML);
-        headers.add("SOAPAction", "http://www.oorsprong.org/websamples.countryinfo/CapitalCity");
-        headers.setBasicAuth("username", "P@ssword");
+        headers.add("SOAPAction", "http://www.oorsprong.org/websamples.countryinfo/CountryInfoService.wso/CapitalCity");
 
         HttpEntity<String> entity = new HttpEntity<>(requestXml, headers);
-
         ResponseEntity<String> response = restTemplate.exchange(
                 "http://webservices.oorsprong.org/websamples.countryinfo/CountryInfoService.wso",
                 HttpMethod.POST,
@@ -51,13 +47,12 @@ public class SoapController {
         log.info(body);
         assert body != null;
         String capital = extractCapitalCity(body);
-
         return new ResponseEntity<>(capital, HttpStatus.OK);
     }
 
     private static String setRequest() {
 
-        String countryCode = "TH";
+        var countryCode = "TH";
 
         return String.format("""
                 <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
@@ -71,10 +66,10 @@ public class SoapController {
                 </soapenv:Envelope>
                 """, countryCode);
     }
-
-    private String extractCapitalCity(String xml) throws Exception {
-        Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+     private String extractCapitalCity(String xml) throws Exception {
+        var doc = DocumentBuilderFactory.newInstance().newDocumentBuilder()
                 .parse(new java.io.ByteArrayInputStream(xml.getBytes()));
+
 
         XPath xpath = XPathFactory.newInstance().newXPath();
         String expression = "//*[local-name()='CapitalCityResult']/text()";
@@ -84,8 +79,6 @@ public class SoapController {
     @GetMapping("/getSoap")
     @Operation(summary = "Send To Soap", description = "Test Send To Soap")
     public ResponseEntity getSoapAPI() {
-        CapitalCityResponse response = soapClientService.capitalCity("TH");
+        var response = soapClientService.capitalCity("TH");
         return new ResponseEntity<>(response.getCapitalCityResult(), HttpStatus.OK);
-    }
-
-}
+    } }
