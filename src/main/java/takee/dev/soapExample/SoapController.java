@@ -3,6 +3,7 @@ package takee.dev.soapExample;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,7 +28,7 @@ public class SoapController {
 
     @GetMapping("/getRequest")
     @Operation(summary = "Send To Soap", description = "Test Send To Soap")
-    public ResponseEntity getMethodName() throws Exception {
+    public ResponseEntity<Object> getMethodName() throws Exception {
 
         String requestXml = setRequest();
 
@@ -67,10 +68,11 @@ public class SoapController {
                 </soapenv:Envelope>
                 """, countryCode);
     }
-     private String extractCapitalCity(String xml) throws Exception {
+
+    @SneakyThrows
+    private String extractCapitalCity(String xml) {
         var doc = DocumentBuilderFactory.newInstance().newDocumentBuilder()
                 .parse(new java.io.ByteArrayInputStream(xml.getBytes()));
-
 
         XPath xpath = XPathFactory.newInstance().newXPath();
         String expression = "//*[local-name()='CapitalCityResult']/text()";
@@ -79,7 +81,8 @@ public class SoapController {
 
     @GetMapping("/getSoap")
     @Operation(summary = "Send To Soap", description = "Test Send To Soap")
-    public ResponseEntity getSoapAPI() {
+    public ResponseEntity<Object> getSoapAPI() {
         var response = soapClientService.capitalCity("TH");
         return new ResponseEntity<>(response.getCapitalCityResult(), HttpStatus.OK);
-    } }
+    }
+}
